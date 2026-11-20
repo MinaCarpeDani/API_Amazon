@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda Amazon</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🛒 Tienda Amazon</h1>
+    <nav>
+      <a href="index.html" class="activo">Inicio</a>
+      <a href="agregar.html">Agregar Producto</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Nuestros Productos</h2>
+    <div id="lista-productos" class="productos-grid">
+      <p class="cargando">Cargando productos...</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 API Amazon</p>
+  </footer>
+
+  <script>
+    // ⚠️ Usamos la URL completa porque abres el HTML directamente en el navegador
+    const API_URL = 'http://localhost:3000/api/productos';
+
+    fetch(API_URL)
+      .then(res => {
+        if (!res.ok) throw new Error('Error del servidor');
+        return res.json();
+      })
+      .then(productos => {
+        const contenedor = document.getElementById('lista-productos');
+        
+        if (productos.length === 0) {
+          contenedor.innerHTML = '<p class="mensaje">No hay productos aún. ¡Sé el primero en <a href="agregar.html">agregar uno</a>!</p>';
+          return;
+        }
+
+        contenedor.innerHTML = productos.map(producto => `
+          <div class="producto-card">
+            ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}">` : ''}
+            <h3>${producto.nombre}</h3>
+            <p class="categoria">${producto.categoria || 'Sin categoría'}</p>
+            <p class="precio">$${producto.precio.toFixed(2)}</p>
+            <p class="stock">Disponibles: ${producto.stock || 0}</p>
+            <div style="margin-top: 0.8rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+              <a href="detalle.html?id=${producto._id}" class="btn">Editar</a>
+              <button onclick="eliminarProducto('${producto._id}')" class="btn" style="background: #b12704; color: white;">Eliminar</button>
+            </div>
+          </div>
+        `).join('');
+      })
+      .catch(err => {
+        document.getElementById('lista-productos').innerHTML = 
+          '<p class="error">❌ Error al cargar productos. Verifica que el servidor esté corriendo en http://localhost:3000</p>';
+      });
+
+    // Función para eliminar producto
+    function eliminarProducto(id) {
+      if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+      
+      fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+        .then(res => {
+          if (res.ok) {
+            alert('✅ Producto eliminado');
+            location.reload();
+          } else {
+            alert('❌ No se pudo eliminar');
+          }
+        })
+        .catch(() => alert('❌ Error de conexión'));
+    }
+  </script>
+</body>
+</html>

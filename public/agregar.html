@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agregar Producto</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🛒 Tienda Amazon</h1>
+    <nav>
+      <a href="index.html">Ver Productos</a>
+      <a href="agregar.html" class="activo">Agregar Producto</a>
+    </nav>
+  </header>
+
+  <main class="form-container">
+    <h2>Agregar Nuevo Producto</h2>
+    
+    <form id="form-producto">
+      <div class="campo">
+        <label>Nombre:</label>
+        <input type="text" id="nombre" required>
+      </div>
+
+      <div class="campo">
+        <label>Precio:</label>
+        <input type="number" id="precio" step="0.01" min="0" required>
+      </div>
+
+      <div class="campo">
+        <label>Categoría:</label>
+        <input type="text" id="categoria" required>
+      </div>
+
+      <div class="campo">
+        <label>Stock:</label>
+        <input type="number" id="stock" min="0" required>
+      </div>
+
+      <div class="campo">
+        <label>detalle-imagen (enlace):</label>
+        <input type="url" id="foto" placeholder="https://ejemplo.com/imagen.jpg">
+      </div>
+
+      <button type="submit" class="btn btn-enviar">✅ Guardar Producto</button>
+    </form>
+
+    <div id="mensaje-exito" class="mensaje-exito" style="display: none;">
+      <p>✅ ¡Producto agregado correctamente con POST!</p>
+      <a href="index.html" class="btn">Ver todos los productos</a>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 API Amazon</p>
+  </footer>
+
+  <script>
+    const form = document.getElementById('form-producto');
+    const mensajeExito = document.getElementById('mensaje-exito');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const datos = {
+        nombre: document.getElementById('nombre').value,
+        precio: parseFloat(document.getElementById('precio').value),
+        categoria: document.getElementById('categoria').value,
+        stock: parseInt(document.getElementById('stock').value),
+        foto: document.getElementById('foto').value || undefined
+      };
+
+      try {
+        const respuesta = await fetch('/api/productos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+
+        if (respuesta.ok) {
+          form.style.display = 'none';
+          mensajeExito.style.display = 'block';
+        } else {
+          alert('❌ Error al guardar');
+        }
+      } catch (error) {
+        alert('❌ No se pudo conectar con el servidor');
+      }
+    });
+  </script>
+</body>
+</html>

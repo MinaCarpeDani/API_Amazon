@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalles del Producto</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🛒 Tienda Amazon</h1>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="agregar.html">Agregar Producto</a>
+    </nav>
+  </header>
+
+  <main>
+    <a href="index.html" class="btn btn-volver">← Volver a Productos</a>
+    
+    <div id="detalle-producto" class="detalle-container">
+      <p class="cargando">Cargando producto...</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 API Amazon</p>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const productoId = params.get('id');
+
+    fetch('/api/productos/${productoId}')
+      .then(res => {
+        if (!res.ok) throw new Error('No encontrado');
+        return res.json();
+      })
+      .then(producto => {
+        const contenedor = document.getElementById('detalle-producto');
+        contenedor.innerHTML = `
+          <div class="detalle-imagen">
+            <img src="${producto.imagen}" alt="${producto.nombre}">
+          </div>
+          <div class="detalle-info">
+            <h2>${producto.nombre}</h2>
+            <p class="categoria">Categoría: ${producto.categoria}</p>
+            <p class="precio-grande">$${producto.precio.toFixed(2)}</p>
+            <p class="stock">En existencia: ${producto.stock} unidades</p>
+            <p class="fecha">Agregado el: ${new Date(producto.createdAt).toLocaleDateString('es-ES')}</p>
+          </div>
+        `;
+      })
+      .catch(err => {
+        document.getElementById('detalle-producto').innerHTML = '<p class="error">❌ Producto no encontrado</p>';
+      });
+  </script>
+</body>
+</html>
